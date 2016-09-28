@@ -3,35 +3,29 @@ Starting with this code https://github.com/ivpusic/grpool
 */
 package dispatcher
 
-import (
-	//"fmt"
-)
-
-
+import "sync"
 
 type worker struct {
-	pool chan *worker
+	pool    chan *worker
 	newTask chan Task
-	stop chan bool	
+	stop    chan bool
 }
 
 type Task func()
 
-func (w *worker) start(){
+func (w *worker) start() {
 
-	go func(){
+	go func() {
 
 		for {
-			//fmt.Println("Worker: 1")
 			w.pool <- w
 
-			//fmt.Println("Worker: 2")
-
 			select {
-			case job := <-w.newTask:	
+			case job := <-w.newTask:
 				job()
 				
-			case stop := <- w.stop:
+
+			case stop := <-w.stop:
 				//¿Close both channels  or use w.close()?
 				//In that case this is correct
 				if stop {
@@ -40,68 +34,85 @@ func (w *worker) start(){
 				}
 			}
 
-
 		}
 	}()
 
 }
 
-func newWorker (pool chan *worker) *worker{
-	return &worker {
+func newWorker(pool chan *worker) *worker {
+	return &worker{
 		newTask: make(chan Task),
-		stop: make(chan bool),
-		pool: pool,
+		stop:    make(chan bool),
+		pool:    pool,
 	}
 }
 
-type Dispatcher struct{
+type Dispatcher struct {
 	queue chan Task
-	pool chan *worker
-	stop chan bool
+	pool  chan *worker
+	stop  chan bool
+	size  int
+	wg    sync.WaitGroup
 }
 
-func (d *Dispatcher) dispatch(){	
-
-	go func(){
+func (d *Dispatcher) Dispatch() {
+	
+	go func() {
 		for {
-				//fmt.Println("Dispatcher: 3")
 			select {
 			case job := <-d.queue:
 				w := <-d.pool
 				w.newTask <- job
-			case stop := <- d.stop:
+			case stop := <-d.stop:
 				//¿Close both channels  or use w.close()?
 				//In that case this is correct
 				if stop {
+					for i := 0; i < d.size; i++ {
+						worker := <-d.pool
+						worker.stop <- true
+						<-worker.stop
+					}
+
 					d.stop <- true
 					return
 				}
 			}
-			//fmt.Println("Dispatcher: 4")
 		}
 	}()
 }
 
-func NewDispatcher (nWorkers int, qCapacity int) *Dispatcher{
+// If you are not using WaitAll
+func (d *Dispatcher) Done() {
+	d.wg.Done()
+}
 
-	//fmt.Println("Dispatcher: 1")
-	
-	d := &Dispatcher {
+func (d *Dispatcher) Wait(n int) {
+	d.wg.Add(n)
+}
+
+func (d *Dispatcher) WaitAll() {
+	d.wg.Wait()
+}
+
+func (d *Dispatcher) Release() {
+	d.stop <- true
+	<-d.stop
+}
+
+func NewDispatcher(nWorkers int, qCapacity int) *Dispatcher {
+
+	d := &Dispatcher{
 		queue: make(chan Task, qCapacity),
-		stop: make(chan bool),
-		pool: make(chan *worker, nWorkers),
+		stop:  make(chan bool),
+		size:  qCapacity,
+		pool:  make(chan *worker, nWorkers),
 	}
 
-	for i:= 0; i< nWorkers; i++{
+	for i := 0; i < nWorkers; i++ {
 		w := newWorker(d.pool)
 		w.start()
 	}
 
-	//fmt.Println("Dispatcher: 2")
-	d.dispatch()
-	//fmt.Println("Dispatcher: 22")
+	d.Dispatch()
 	return d
 }
-
-
-

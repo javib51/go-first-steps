@@ -1,30 +1,26 @@
 package dispatcher
 
 import (
-	"fmt"
+	//"fmt"
 	"runtime"
 )
 
-func Test1(){
-
-	numCPUs := runtime.NumCPU()
+func Test1() {
+	//recommendated
+	var numCPUs int = runtime.NumCPU()
+	var queue int = 1000000
 	runtime.GOMAXPROCS(numCPUs)
-	println("using MAXPROC ",numCPUs)
-	
-	var workers int = 20
-	var queue int = 100
-	
-	orchestator := NewDispatcher(workers, queue)
+	println("using MAXPROC ", numCPUs)
+	orchestator := NewDispatcher(numCPUs, queue)
 
-	for i:=0; i < queue ; i++ {
-		orchestator.queue<- func() {
-			if i%2==0{
-				fmt.Println(":Im worker!")
-			} else {
-				fmt.Println(":Im worker")
-			}
+	for i := 0; i < queue; i++ {
+		orchestator.Wait(1)
+		orchestator.queue <- func() {
+			//fmt.Println(i, ":Im worker!")
+			orchestator.Done()
 		}
+		
 	}
-	for {}
-	
+	//defer orchestator.Release()
+	orchestator.WaitAll()
 }
