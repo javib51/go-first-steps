@@ -58,3 +58,14 @@ func PMergeSort(data []int) ([]int){
 }
 
 
+
+// Merge sort with no extra allocation
+func MergeSortFast(data []int){
+	if len(data) > 1 {
+		middle := len(data)/2
+		MergeSortFast(data[:middle])
+		MergeSortFast(data[middle:])
+		QuickSort(data)
+		//MergeFast(data, middle)
+	}
+}
