@@ -71,7 +71,7 @@ func mergeSortNoAllocGeneral(t *testing.T, size int) (int){
 	return testArray(t, size,  a1, a2)
 }
 
-func TestMergeSortFast(t *testing.T){
+func TestMergeSortNoAlloc(t *testing.T){
 	var size int = 100000
 	
 	for i := 1; i <= size; i *= 10 {
@@ -385,6 +385,18 @@ func BenchmarkBuiltin100M(b * testing.B) {
 	b.ResetTimer()
 	
 	sort.Ints(array)
+}
+
+func BenchmarkMergeSortNoAlloc100M(b * testing.B) {
+
+	var size int = 100000000 * b.N
+
+	array := initBenchmark(size)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	
+	MergeSortNoAlloc(array)
 }
 
 func BenchmarkQuickSort100M(b * testing.B) {
