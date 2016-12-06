@@ -93,7 +93,25 @@ func TestQuickSort(t *testing.T){
 	var size int = 1000000
 	
 	for i := 1; i <= size; i *= 10 {
-		if  mergeSortGeneral(t, i) == -1 {
+		if  quickSortGeneral(t, i) == -1 {
+			break
+		}
+	}
+}
+
+func quickSortParallelGeneral(t *testing.T, size int) (int){
+	a1, a2 := initTest(size)	
+	sort.Ints(a1)
+	QuickSortParallel(a2)
+
+	return testArray(t, size, a1, a2)
+}
+
+func TestQuickSortParallel(t *testing.T){
+	var size int = 1000000
+	
+	for i := 1; i <= size; i *= 10 {
+		if  quickSortParallelGeneral(t, i) == -1 {
 			break
 		}
 	}
@@ -156,7 +174,7 @@ func BenchmarkMergeSort1k(b * testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	
-	array = MergeSort(array)
+	MergeSort(array)
 }
 
 func BenchmarkMergeSortNoAlloc1k(b * testing.B) {
@@ -181,6 +199,18 @@ func BenchmarkQuickSort1k(b * testing.B) {
 	b.ResetTimer()
 	
 	QuickSort(array)
+}
+
+func BenchmarkQuickSortParallel1k(b * testing.B) {
+
+	var size int =  1000 * b.N
+
+	array := initBenchmark(size)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	
+	QuickSortParallel(array)
 }
 
 func BenchmarkBubbleSort1k(b * testing.B) {
@@ -228,7 +258,7 @@ func BenchmarkMergeSort10k(b * testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	
-	array = MergeSort(array)
+	MergeSort(array)
 }
 
 func BenchmarkMergeSortNoAlloc10k(b * testing.B) {
@@ -253,6 +283,18 @@ func BenchmarkQuickSort10k(b * testing.B) {
 	b.ResetTimer()
 	
 	QuickSort(array)
+}
+
+func BenchmarkQuickSortParallel10k(b * testing.B) {
+
+	var size int =  10000 * b.N
+
+	array := initBenchmark(size)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	
+	QuickSortParallel(array)
 }
 
 func BenchmarkBubbleSort10k(b * testing.B) {
@@ -300,7 +342,7 @@ func BenchmarkMergeSort1M(b * testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	
-	array = MergeSort(array)
+	MergeSort(array)
 }
 
 func BenchmarkMergeSortNoAlloc1M(b * testing.B) {
@@ -327,6 +369,18 @@ func BenchmarkQuickSort1M(b * testing.B) {
 	QuickSort(array)
 }
 
+func BenchmarkQuickSortParallel1M(b * testing.B) {
+
+	var size int = 1000000 * b.N
+
+	array := initBenchmark(size)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	
+	QuickSortParallel(array)
+}
+
 func BenchmarkBuiltin20M(b * testing.B) {
 
 	var size int = 20000000 * b.N
@@ -348,7 +402,7 @@ func BenchmarkMergeSort20M(b * testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	
-	array = MergeSort(array)
+	MergeSort(array)
 }
 
 func BenchmarkMergeSortNoAlloc20M(b * testing.B) {
@@ -375,6 +429,19 @@ func BenchmarkQuickSort20M(b * testing.B) {
 	QuickSort(array)
 }
 
+
+func BenchmarkQuickSortParallel20M(b * testing.B) {
+
+	var size int = 20000000 * b.N
+
+	array := initBenchmark(size)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	
+	QuickSortParallel(array)
+}
+
 func BenchmarkBuiltin100M(b * testing.B) {
 
 	var size int = 100000000 * b.N
@@ -397,4 +464,16 @@ func BenchmarkQuickSort100M(b * testing.B) {
 	b.ResetTimer()
 	
 	QuickSort(array)
+}
+
+func BenchmarkQuickSortParallel100M(b * testing.B) {
+
+	var size int = 100000000 * b.N
+
+	array := initBenchmark(size)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	
+	QuickSortParallel(array)
 }
