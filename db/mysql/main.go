@@ -3,7 +3,7 @@
 // -e MYSQL_USER=gouser -e MYSQL_PASSWORD=gupw55 \
 // -e MYSQL_DATABASE=hello -e MYSQL_ROOT_PASSWORD=r00t55 \
 // -d mysql
-// CREATE TABLE messages ( id INT NOT NULL AUTO_INCREMENT, messages TEXT NOT NULL, PRIMARY KEY(id));
+// CREATE TABLE messages ( id INT NOT NULL AUTO_INCREMENT, message VARCHAR(100) NOT NULL, PRIMARY KEY(id));
 package main
 
 import (
