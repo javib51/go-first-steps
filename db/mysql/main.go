@@ -31,16 +31,18 @@ func db_connect() *sql.DB {
 		panic(err)
 	}
 
-	defer db.Close()
+	//defer db.Close()
 
 	return db
 }
 
 func getMessages(respW http.ResponseWriter, req *http.Request) {
-	rows, err := db.Query("SELECT id, message from messages")
+	
+	rows, err := db.Query("SELECT id, message FROM messages")
 
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "getMessages: ERROR:\n")
+		fmt.Fprintf(os.Stderr, "getMessages: ERROR:\n", err)
+		return
 	}
 	defer rows.Close()
 
@@ -54,7 +56,8 @@ func getMessages(respW http.ResponseWriter, req *http.Request) {
 		}
 		messages = append(messages, message)
 	}
-
+	
+	respW.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(respW).Encode(messages)
 }
 
@@ -83,6 +86,7 @@ func hello(respW http.ResponseWriter, req *http.Request) {
 func serve_rest_api() {
 	// Create db object
 	db = db_connect()
+	defer db.Close()
 
 	// Create Router
 	router := mux.NewRouter().StrictSlash(false)
