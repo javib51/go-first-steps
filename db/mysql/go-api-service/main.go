@@ -25,7 +25,7 @@ type Message struct {
 var db *sql.DB
 
 func db_connect() *sql.DB {
-	db, err := sql.Open("mysql", "gouser:gupw55@tcp(172.17.0.2)/hello")
+	db, err := sql.Open("mysql", "gouser:gupw55@tcp(mysql)/hello")
 
 	if err != nil {
 		panic(err)

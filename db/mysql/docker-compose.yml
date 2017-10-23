@@ -1,0 +1,17 @@
+version: '3'
+services:
+  go-api-service:
+    #container_name: go-api-service
+    build: ./go-api-service
+    ports:
+     - "8080:8080"
+  mysql:
+    image: "mysql:latest"
+    volumes:
+      - ./mysql-basic:/docker-entrypoint-initdb.d
+    environment:        
+      #  - MYSQL_USER=gouser
+      - MYSQL_ROOT_PASSWORD=r00t55      
+      
+     #ports: 
+     # - "3306:3306"
